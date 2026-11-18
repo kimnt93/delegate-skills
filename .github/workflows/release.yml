@@ -1,0 +1,75 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-and-release:
+    name: Test, Package & Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Unit Tests
+        run: |
+          make test
+
+      - name: Build Distribution Package
+        run: |
+          make dist
+
+      - name: Determine Version
+        id: get_version
+        run: |
+          VERSION=$(python3 -c 'import json; print(json.load(open("plugin.json"))["version"])')
+          TAG="v${VERSION}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Create or Update Tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -fa "${{ steps.get_version.outputs.tag }}" -m "Release ${{ steps.get_version.outputs.tag }}"
+          git push origin "${{ steps.get_version.outputs.tag }}" --force || echo "Tag update pushed"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          name: "delegate-skills ${{ steps.get_version.outputs.tag }}"
+          body: |
+            ## delegate-skills ${{ steps.get_version.outputs.tag }}
+            
+            Universal AI Coding Agent CLI Delegation Framework.
+            
+            ### Quick Install
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/kimnt93/delegate-skills/main/install.sh | bash
+            ```
+            
+            ### Included in this Release
+            - Universal `/delegate` slash command & CLI runner
+            - Stably AI Orca CLI session integration
+            - Support for 21 coding agent CLIs (Codex, Claude, Grok, DeepSeek, Kiro, Muse, Hermes, etc.)
+            - Model selection & reasoning controls
+            - Default YOLO mode (auto-approve all permissions)
+          draft: false
+          prerelease: false
+          files:
+            - dist/delegate-skills.tar.gz
+            - install.sh

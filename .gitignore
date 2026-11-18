@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.tar.gz
+
+# Environment & local
+.env
+.venv/
+env/
+venv/
+.DS_Store

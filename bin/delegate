@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Entrypoint for delegate CLI
+# Finds the script directory and runs delegate.py with system python3
+
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+ROOT_DIR="$(cd -P "$(dirname "$SOURCE")/.." >/dev/null 2>&1 && pwd)"
+
+SCRIPT_PATH="$ROOT_DIR/skills/delegate/scripts/delegate.py"
+
+if [ ! -f "$SCRIPT_PATH" ]; then
+  # Fallback if installed in user directory
+  SCRIPT_PATH="$HOME/.local/share/delegate-skills/skills/delegate/scripts/delegate.py"
+fi
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Error: python3 is required to run delegate-skills." >&2
+  exit 1
+fi
+
+exec python3 "$SCRIPT_PATH" "$@"

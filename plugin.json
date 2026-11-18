@@ -1,0 +1,13 @@
+{
+  "name": "delegate-skills",
+  "displayName": "Delegate Skills",
+  "description": "Multi-agent CLI delegation framework supporting Orca CLI sessions, Codex, Claude Code, OMP, Pi, Antigravity, and headless implementers with review-first diff gates.",
+  "version": "1.0.0",
+  "author": "kimnt93",
+  "repository": "https://github.com/kimnt93/delegate-skills",
+  "suggestedPrompts": [
+    "/delegate hey codex, implement UI for cars display",
+    "/delegate claude: write comprehensive unit tests for auth service",
+    "/delegate refactor database connection pooling"
+  ]
+}
